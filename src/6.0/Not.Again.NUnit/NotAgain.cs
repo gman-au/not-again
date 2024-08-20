@@ -18,6 +18,19 @@ namespace Not.Again.NUnit
         {
             _submitResult = true;
 
+            int
+                .TryParse(
+                    Environment.GetEnvironmentVariable(StandardConstants.RerunTestsOlderThanDaysVariableName) ?? "0",
+                    out var rerunTestsOlderThanDays
+                );
+
+            rerunTestsOlderThanDays =
+                Math
+                    .Max(
+                        0,
+                        rerunTestsOlderThanDays
+                    );
+
             bool alreadyReported;
 
             var context =
@@ -26,7 +39,7 @@ namespace Not.Again.NUnit
 
             var runCheckRequest =
                 context
-                    .ToRunCheckRequest();
+                    .ToRunCheckRequest(rerunTestsOlderThanDays);
 
             if (!string.IsNullOrEmpty(NotAgainUrl))
             {
@@ -42,7 +55,7 @@ namespace Not.Again.NUnit
             else
             {
                 _submitResult = false;
-                
+
                 TestContext
                     .WriteLine(StandardMessages.NoUrlEnvVariableSuppliedMessage);
 
@@ -60,7 +73,7 @@ namespace Not.Again.NUnit
             else
             {
                 _submitResult = false;
-                
+
                 TestContext
                     .WriteLine(StandardMessages.IgnoringThisTestMessage);
                 Assert

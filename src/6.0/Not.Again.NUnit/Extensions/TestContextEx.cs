@@ -7,12 +7,12 @@ namespace Not.Again.NUnit.Extensions
 {
     public static class TestContextEx
     {
-        internal static RunCheckRequest ToRunCheckRequest(this TestContext context)
+        internal static RunCheckRequest ToRunCheckRequest(this TestContext context, int? rerunTestsOlderThanDays)
         {
             return new RunCheckRequest
             {
                 TestDetails = GetTestDetails(context),
-                RerunTestsOlderThanDays = 10
+                RerunTestsOlderThanDays = rerunTestsOlderThanDays ?? StandardConstants.DefaultRerunTestsOlderThanDays
             };
         }
 
