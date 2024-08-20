@@ -3,9 +3,8 @@ name: nuget
 on:
   push:
     branches: [ master ]  
-    paths-ignore:
-      - 'src/6.0/Not.Again.Api.Host/**'
-      - 'src/6.0/**Test*'
+    paths:
+      - 'src/6.0/**'
 jobs:
   nuget:
     runs-on: ubuntu-latest
