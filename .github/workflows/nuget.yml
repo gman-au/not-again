@@ -11,7 +11,7 @@ jobs:
     env:
       MAJOR_VERSION: 6
       MINOR_VERSION: 0
-      SOLUTION_PATH: ./src
+      SOLUTION_PATH: ./src/6.0
     steps:
     - uses: actions/checkout@v2
     - name: Setup .NET
