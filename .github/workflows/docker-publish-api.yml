@@ -26,7 +26,7 @@ jobs:
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login docker.io -u $USER_PATH --password-stdin
         
       - name: Build image
-        run: docker build --file ./src/6.0/Not.Again.Api.Host/Dockerfile --build-arg PAT=${{ secrets.PACKAGE_FEED_TOKEN }} --tag $IMAGE_NAME ./src #
+        run: docker build --file ./src/6.0/Not.Again.Api.Host/Dockerfile --build-arg PAT=${{ secrets.PACKAGE_FEED_TOKEN }} --tag $IMAGE_NAME ./src/6.0 #
 
       - name: Push image
         run: |
