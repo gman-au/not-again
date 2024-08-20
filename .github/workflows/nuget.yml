@@ -1,0 +1,35 @@
+name: nuget
+
+on:
+  push:
+    branches: [ master ]  
+    paths-ignore:
+      - 'src/6.0/Not.Again.Api.Host/**'
+      - 'src/6.0/**Test*'
+jobs:
+  nuget:
+    runs-on: ubuntu-latest
+    env:
+      MAJOR_VERSION: 6
+      MINOR_VERSION: 0
+      SOLUTION_PATH: ./src
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x        
+    - name: Restore dependencies
+      run: dotnet restore $SOLUTION_PATH
+    - name: Build
+      run: dotnet build $SOLUTION_PATH --no-restore --ignore-failed-sources /p:Version=$MAJOR_VERSION.$MINOR_VERSION.$GITHUB_RUN_NUMBER -c Release
+    - name: Test
+      run: dotnet test $SOLUTION_PATH --no-restore --verbosity normal
+    - name: Create output folder
+      run: mkdir ./output
+    - name: Consolidate packages (including symbols)
+      run: find . -name "*$MAJOR_VERSION.$MINOR_VERSION.$GITHUB_RUN_NUMBER.*nupkg" -type f -exec cp {} ./output \;
+    - name: Echo packages
+      run: find ./output -name "*.*nupkg" -type f -exec echo {} \;
+    - name: Push
+      run: find ./output -name "*.nupkg" -type f -exec dotnet nuget push "{}" --api-key ${{ secrets.GITHUB_TOKEN }} --source "https://nuget.pkg.github.com/gman-au" \;
