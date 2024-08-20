@@ -2,7 +2,25 @@
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+        <DebugType>Embedded</DebugType>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSymbols>false</IncludeSymbols>
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     </PropertyGroup>
+
+    <PropertyGroup>
+        <Company>G-MAN Solutions</Company>
+        <Authors>Gabriel Palma</Authors>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <PackageId>Not.Again.Interfaces</PackageId>
+        <Description>Not Again interface module</Description>
+        <RepositoryUrl>https://github.com/gman-au/not-again</RepositoryUrl>
+    </PropertyGroup>
+
 
     <ItemGroup>
         <ProjectReference Include="..\Not.Again.Contracts\Not.Again.Contracts.csproj"/>

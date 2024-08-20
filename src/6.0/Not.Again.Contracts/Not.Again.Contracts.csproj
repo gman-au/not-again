@@ -2,6 +2,23 @@
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+        <DebugType>Embedded</DebugType>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSymbols>false</IncludeSymbols>
+        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Company>G-MAN Solutions</Company>
+        <Authors>Gabriel Palma</Authors>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <PackageId>Not.Again.Contracts</PackageId>
+        <Description>Not Again API contracts module</Description>
+        <RepositoryUrl>https://github.com/gman-au/not-again</RepositoryUrl>
     </PropertyGroup>
 
 </Project>
