@@ -18,6 +18,12 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Content Include="..\Dockerfile">
+            <Link>Dockerfile</Link>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
       <ProjectReference Include="..\Not.Again.Database\Not.Again.Database.csproj" />
       <ProjectReference Include="..\Not.Again.Interfaces\Not.Again.Interfaces.csproj" />
     </ItemGroup>
