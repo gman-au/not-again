@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Not.Again.Api.Host.Injection;
@@ -14,6 +15,9 @@ var services =
 var configuration =
     builder
         .Configuration;
+
+configuration
+    .AddEnvironmentVariables();
 
 services
     .AddControllers();

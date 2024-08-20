@@ -7,21 +7,18 @@ using NUnit.Framework;
 
 namespace Not.Again.NUnit
 {
-    public class NotAgain
+    public static class NotAgain
     {
-        private const string BaseUrlVariableName = "NOT_AGAIN_URL";
-        private const string IgnoreMessage = "This test has been run previously - ignoring";
-
-        private static readonly string NotAgainUrl = Environment.GetEnvironmentVariable(BaseUrlVariableName);
+        private static readonly string NotAgainUrl = Environment.GetEnvironmentVariable(StandardConstants.BaseUrlVariableName);
+        private static readonly Stopwatch Stopwatch = new();
 
         private static bool _submitResult;
-        private static readonly Stopwatch Stopwatch = new();
 
         public static async Task SetupAsync()
         {
             _submitResult = true;
 
-            var alreadyReported = false;
+            bool alreadyReported;
 
             var context =
                 TestContext
@@ -42,11 +39,20 @@ namespace Not.Again.NUnit
                                 TestContext.WriteLine
                             );
             }
+            else
+            {
+                _submitResult = false;
+                
+                TestContext
+                    .WriteLine(StandardMessages.NoUrlEnvVariableSuppliedMessage);
+
+                return;
+            }
 
             if (!alreadyReported)
             {
                 TestContext
-                    .WriteLine("No previous applicable test run reported, running this test...");
+                    .WriteLine(StandardMessages.RunningThisTestMessage);
 
                 Stopwatch
                     .Start();
@@ -54,10 +60,11 @@ namespace Not.Again.NUnit
             else
             {
                 _submitResult = false;
+                
                 TestContext
-                    .WriteLine(IgnoreMessage);
+                    .WriteLine(StandardMessages.IgnoringThisTestMessage);
                 Assert
-                    .Ignore(IgnoreMessage);
+                    .Ignore(StandardMessages.IgnoringThisTestMessage);
             }
         }
 
@@ -85,6 +92,11 @@ namespace Not.Again.NUnit
                             NotAgainUrl,
                             TestContext.WriteLine
                         );
+            }
+            else
+            {
+                TestContext
+                    .WriteLine(StandardMessages.NoUrlEnvVariableSuppliedMessage);
             }
         }
     }

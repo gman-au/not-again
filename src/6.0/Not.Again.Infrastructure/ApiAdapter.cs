@@ -43,7 +43,7 @@ namespace Not.Again.Infrastructure
                 logAction("Warning - there was an error when attempting to connect to the API; please check your configuration.");
             }
 
-            logAction($"API response received for test ID {runCheckRequest?.TestDetails?.Id}");
+            logAction($"Submitted check request for test ID [{runCheckRequest?.TestDetails?.Id}]");
             
             return false;
         }
@@ -70,7 +70,7 @@ namespace Not.Again.Infrastructure
                             submitResultRequest
                         );
                     
-                logAction($"API response received for test ID {submitResultRequest?.TestDetails?.Id}");
+                logAction($"Submitted result for test ID [{submitResultRequest?.TestDetails?.Id}]");
             }
             catch (HttpRequestException ex)
             {

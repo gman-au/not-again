@@ -40,7 +40,7 @@ namespace Not.Again.NUnit.Extensions
             var methodName =
                 context
                     .Test
-                    .ClassName;
+                    .MethodName;
 
             var assemblyQualifiedName =
                 AssemblyLoader
