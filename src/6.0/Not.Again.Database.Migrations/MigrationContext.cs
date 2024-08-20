@@ -7,7 +7,7 @@ namespace Not.Again.Database.Migrations
 {
     public class MigrationContext : NotAgainDbContext
     {
-        public MigrationContext() {}
+        public MigrationContext() { }
 
         public MigrationContext(DbContextOptions<NotAgainDbContext> options)
             : base(options)

@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="NUnit" Version="3.13.3"/>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\Not.Again.Infrastructure\Not.Again.Infrastructure.csproj" />
+    </ItemGroup>
+
+</Project>

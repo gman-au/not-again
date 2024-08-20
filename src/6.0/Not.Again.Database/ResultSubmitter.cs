@@ -12,7 +12,7 @@ namespace Not.Again.Database
         private readonly NotAgainDbContext _context;
         private readonly ITestAssemblyGetter _testAssemblyGetter;
         private readonly ITestRecordGetter _testRecordGetter;
-        
+
         public ResultSubmitter(
             ITestAssemblyGetter testAssemblyGetter,
             ITestRecordGetter testRecordGetter,
@@ -25,7 +25,7 @@ namespace Not.Again.Database
             _argumentDelimiter = argumentDelimiter;
             _context = context;
         }
-        
+
         public async Task SubmitResultAsync(SubmitResultRequest request)
         {
             var dbAssembly =
