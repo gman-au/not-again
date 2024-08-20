@@ -25,7 +25,7 @@ namespace Sample.NUnit.Test.Project
             Assert
                 .That(
                     result,
-                    Has.Length.EqualTo(3)
+                    Has.Length.EqualTo(2)
                 );
         }
 

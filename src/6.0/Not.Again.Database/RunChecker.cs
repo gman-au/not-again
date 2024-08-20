@@ -14,22 +14,31 @@ namespace Not.Again.Database
         private readonly NotAgainDbContext _context;
         private readonly ITestAssemblyGetter _testAssemblyGetter;
         private readonly ITestRecordGetter _testRecordGetter;
+        private readonly IMessageFormatter _messageFormatter;
 
         public RunChecker(
             ITestAssemblyGetter testAssemblyGetter,
             ITestRecordGetter testRecordGetter,
             IArgumentDelimiter argumentDelimiter,
-            NotAgainDbContext context
+            NotAgainDbContext context, 
+            IMessageFormatter messageFormatter
         )
         {
             _testAssemblyGetter = testAssemblyGetter;
             _testRecordGetter = testRecordGetter;
             _argumentDelimiter = argumentDelimiter;
             _context = context;
+            _messageFormatter = messageFormatter;
         }
 
-        public async Task<bool> GetLastAsync(RunCheckRequest request)
+        public async Task<DiagnosticResponse> GetLastAsync(RunCheckRequest request)
         {
+            var result = new DiagnosticResponse
+            {
+                IgnoreThisTest = false,
+                Message = null
+            };
+            
             var dbAssembly =
                 await
                     _testAssemblyGetter
@@ -40,7 +49,14 @@ namespace Not.Again.Database
                             }
                         );
 
-            if (dbAssembly == null) return true;
+            if (dbAssembly == null)
+            {
+                result.Message = 
+                    _messageFormatter
+                        .EncapsulateNotAgainMessage($"No prior record of this test assembly [{request.TestDetails.AssemblyQualifiedName}], the test [{request.TestDetails.FullName}] should NOT be ignored");
+                
+                return result;
+            }
 
             var delimitedArguments =
                 _argumentDelimiter
@@ -62,7 +78,14 @@ namespace Not.Again.Database
                             }
                         );
 
-            if (dbTestRecord == null) return true;
+            if (dbTestRecord == null)
+            {
+                result.Message = 
+                    _messageFormatter
+                        .EncapsulateNotAgainMessage($"The test [{request.TestDetails.FullName}] is either new or has been modified since last run - it should NOT be ignored");
+                
+                return result;
+            }
 
             var lastTestRun =
                 await
@@ -75,14 +98,38 @@ namespace Not.Again.Database
                         .OrderByDescending(o => o.RunDate)
                         .FirstOrDefaultAsync();
 
-            if (lastTestRun == null) return true;
+            if (lastTestRun == null)
+            {
+                result.Message = 
+                    _messageFormatter
+                        .EncapsulateNotAgainMessage($"No prior test run found for this test record [{request.TestDetails.FullName}] - it should NOT be ignored");
+                
+                return result;
+            }
 
             var daysSinceTest = (DateTime.UtcNow - lastTestRun.RunDate).TotalDays;
 
             if (request.RerunTestsOlderThanDays.HasValue)
-                return request.RerunTestsOlderThanDays.Value < daysSinceTest;
+            {
+                result.IgnoreThisTest = request.RerunTestsOlderThanDays.Value > daysSinceTest;
 
-            return false;
+                if (result.IgnoreThisTest)
+                {
+                    result.Message = 
+                        _messageFormatter
+                            .EncapsulateNotAgainMessage($"Last run for test [{request.TestDetails.FullName}] did not exceed the specified interval of {request.RerunTestsOlderThanDays.Value} days - it should be ignored");
+                    
+                    return result;
+                }
+                
+                result.Message = 
+                    _messageFormatter
+                        .EncapsulateNotAgainMessage($"Last run for test [{request.TestDetails.FullName}] exceeded the specified interval of {request.RerunTestsOlderThanDays.Value} days - it should NOT be ignored");
+                
+                return result;
+            }
+
+            return result;
         }
     }
 }

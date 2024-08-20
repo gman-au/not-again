@@ -18,7 +18,8 @@ namespace Not.Again.Api.Host.Injection
                 .AddTransient<ITestRecordGetter, TestRecordGetter>()
                 .AddTransient<ITestAssemblyGetter, TestAssemblyGetter>()
                 .AddTransient<IRunChecker, RunChecker>()
-                .AddTransient<IArgumentDelimiter, ArgumentDelimiter>();
+                .AddTransient<IArgumentDelimiter, ArgumentDelimiter>()
+                .AddTransient<IMessageFormatter, MessageFormatter>();
 
             services
                 .AddDbContext<NotAgainDbContext>(

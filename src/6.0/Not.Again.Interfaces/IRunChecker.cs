@@ -5,6 +5,6 @@ namespace Not.Again.Interfaces
 {
     public interface IRunChecker
     {
-        Task<bool> GetLastAsync(RunCheckRequest request);
+        Task<DiagnosticResponse> GetLastAsync(RunCheckRequest request);
     }
 }

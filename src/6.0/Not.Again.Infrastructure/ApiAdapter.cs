@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
@@ -12,7 +11,7 @@ namespace Not.Again.Infrastructure
         private const string RunCheckEndpoint = "/Diagnostic/RunCheck";
         private const string SubmitResultRequest = "/Diagnostic/ReportResult";
         
-        public static async Task<bool> RunCheckAsync(
+        public static async Task<DiagnosticResponse> RunCheckAsync(
             RunCheckRequest runCheckRequest,
             string notAgainBaseUrl,
             Action<string> logAction
@@ -35,17 +34,29 @@ namespace Not.Again.Infrastructure
                                 runCheckRequest
                             );
 
-                if (result.StatusCode == HttpStatusCode.AlreadyReported)
-                    return true;
+                result
+                    .EnsureSuccessStatusCode();
+                
+                var response = 
+                    await 
+                        result
+                            .Content
+                            .ReadFromJsonAsync<DiagnosticResponse>();
+
+                logAction(response.Message);
+                
+                return response;
             }
-            catch (HttpRequestException ex)
+            catch (HttpRequestException)
             {
                 logAction("Warning - there was an error when attempting to connect to the API; please check your configuration.");
             }
 
-            logAction($"Submitted check request for test ID [{runCheckRequest?.TestDetails?.Id}]");
-            
-            return false;
+            return new DiagnosticResponse
+            {
+                IgnoreThisTest = false,
+                Message = null
+            };
         }
 
         public static async Task SubmitResultAsync(
@@ -72,7 +83,7 @@ namespace Not.Again.Infrastructure
                     
                 logAction($"Submitted result for test ID [{submitResultRequest?.TestDetails?.Id}]");
             }
-            catch (HttpRequestException ex)
+            catch (HttpRequestException)
             {
                 logAction("Warning - there was an error when attempting to connect to the API; please check your configuration.");
             }

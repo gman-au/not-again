@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Not.Again.Contracts;
 using Not.Again.Infrastructure;
 using Not.Again.NUnit.Extensions;
 using NUnit.Framework;
@@ -31,7 +32,7 @@ namespace Not.Again.NUnit
                         rerunTestsOlderThanDays
                     );
 
-            bool alreadyReported;
+            DiagnosticResponse diagnosticResponse;
 
             var context =
                 TestContext
@@ -43,7 +44,7 @@ namespace Not.Again.NUnit
 
             if (!string.IsNullOrEmpty(NotAgainUrl))
             {
-                alreadyReported =
+                diagnosticResponse =
                     await
                         ApiAdapter
                             .RunCheckAsync(
@@ -62,20 +63,15 @@ namespace Not.Again.NUnit
                 return;
             }
 
-            if (!alreadyReported)
+            if (!diagnosticResponse.IgnoreThisTest)
             {
-                TestContext
-                    .WriteLine(StandardMessages.RunningThisTestMessage);
-
                 Stopwatch
                     .Start();
             }
             else
             {
                 _submitResult = false;
-
-                TestContext
-                    .WriteLine(StandardMessages.IgnoringThisTestMessage);
+                
                 Assert
                     .Ignore(StandardMessages.IgnoringThisTestMessage);
             }

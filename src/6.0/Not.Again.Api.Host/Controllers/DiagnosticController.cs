@@ -36,7 +36,7 @@ namespace Not.Again.Api.Host.Controllers
                     _runChecker
                         .GetLastAsync(value);
 
-            return new StatusCodeResult(result ? 200 : 208);
+            return new OkObjectResult(result);
         }
 
         [HttpPost("ReportResult")]
