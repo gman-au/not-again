@@ -59,38 +59,31 @@ namespace Not.Again.Database
 
         private async Task<TestAssembly> AddOrUpdateTestAssemblyAsync(string assemblyName)
         {
-            try
+            var testAssembly = new TestAssembly
             {
-                var testAssembly = new TestAssembly
-                {
-                    TestAssemblyName = assemblyName
-                };
+                TestAssemblyName = assemblyName
+            };
 
-                var dbTestAssembly =
-                    await
-                        _testAssemblyGetter
-                            .GetAsync(testAssembly);
+            var dbTestAssembly =
+                await
+                    _testAssemblyGetter
+                        .GetAsync(testAssembly);
 
-                if (dbTestAssembly == null)
-                {
-                    dbTestAssembly =
-                        (await
-                            _context
-                                .TestAssembly
-                                .AddAsync(testAssembly))
-                        .Entity;
-
-                    await
+            if (dbTestAssembly == null)
+            {
+                dbTestAssembly =
+                    (await
                         _context
-                            .SaveChangesAsync();
-                }
+                            .TestAssembly
+                            .AddAsync(testAssembly))
+                    .Entity;
 
-                return dbTestAssembly;
+                await
+                    _context
+                        .SaveChangesAsync();
             }
-            catch (Exception ex)
-            {
-                return null;
-            }
+
+            return dbTestAssembly;
         }
 
         private async Task<TestRecord> AddOrUpdateTestRecordAsync(
@@ -103,53 +96,46 @@ namespace Not.Again.Database
             string delimitedTestArguments
         )
         {
-            try
+            var testRecord = new TestRecord
             {
-                var testRecord = new TestRecord
-                {
-                    TestAssemblyId = testAssemblyId,
-                    ClassName = className,
-                    FullName = fullName,
-                    MethodName = methodName,
-                    TestName = testName,
-                    DelimitedTestArguments = delimitedTestArguments,
-                    LastHash = hash
-                };
+                TestAssemblyId = testAssemblyId,
+                ClassName = className,
+                FullName = fullName,
+                MethodName = methodName,
+                TestName = testName,
+                DelimitedTestArguments = delimitedTestArguments,
+                LastHash = hash
+            };
 
-                var dbTestRecord =
-                    await
-                        _testRecordGetter
-                            .GetAsync(
-                                testAssemblyId,
-                                testRecord,
-                                true
-                            );
-
-                if (dbTestRecord == null)
-                {
-                    dbTestRecord =
-                        (await
-                            _context
-                                .TestRecord
-                                .AddAsync(testRecord)
-                        )
-                        .Entity;
-                }
-                else
-                {
-                    dbTestRecord.LastHash = testRecord.LastHash;
-                }
-
+            var dbTestRecord =
                 await
-                    _context
-                        .SaveChangesAsync();
+                    _testRecordGetter
+                        .GetAsync(
+                            testAssemblyId,
+                            testRecord,
+                            true
+                        );
 
-                return dbTestRecord;
-            }
-            catch (Exception ex)
+            if (dbTestRecord == null)
             {
-                return null;
+                dbTestRecord =
+                    (await
+                        _context
+                            .TestRecord
+                            .AddAsync(testRecord)
+                    )
+                    .Entity;
             }
+            else
+            {
+                dbTestRecord.LastHash = testRecord.LastHash;
+            }
+
+            await
+                _context
+                    .SaveChangesAsync();
+
+            return dbTestRecord;
         }
 
         private async Task<TestRun> AddTestResultAsync(
@@ -159,33 +145,26 @@ namespace Not.Again.Database
             long duration
         )
         {
-            try
+            var testRun = new TestRun
             {
-                var testRun = new TestRun
-                {
-                    TestRecordId = testRecordId,
-                    RunDate = runDate,
-                    Result = result,
-                    TotalDuration = duration
-                };
+                TestRecordId = testRecordId,
+                RunDate = runDate,
+                Result = result,
+                TotalDuration = duration
+            };
 
-                var dbTestRun =
-                    (await
-                        _context
-                            .TestRun
-                            .AddAsync(testRun))
-                    .Entity;
-
-                await
+            var dbTestRun =
+                (await
                     _context
-                        .SaveChangesAsync();
+                        .TestRun
+                        .AddAsync(testRun))
+                .Entity;
 
-                return dbTestRun;
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
+            await
+                _context
+                    .SaveChangesAsync();
+
+            return dbTestRun;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Not.Again.Database;
@@ -21,10 +22,19 @@ namespace Not.Again.Api.Host.Injection
                 .AddTransient<IArgumentDelimiter, ArgumentDelimiter>()
                 .AddTransient<IMessageFormatter, MessageFormatter>();
 
+            var connectionString =
+                configuration
+                    .GetConnectionString("NOT-AGAIN");
+
+            if (string.IsNullOrEmpty(connectionString))
+                throw new Exception(
+                    "A connection string has not been defined. Please ensure an environment variable \"ConnectionStrings__NOT-AGAIN\" has been supplied."
+                );
+            
             services
                 .AddDbContext<NotAgainDbContext>(
                     o =>
-                        o.UseSqlServer(configuration.GetConnectionString("NOT-AGAIN"))
+                        o.UseSqlServer(connectionString)
                 );
 
             return services;

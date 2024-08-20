@@ -17,26 +17,19 @@ namespace Not.Again.Database
 
         public async Task<TestAssembly> GetAsync(TestAssembly testAssembly)
         {
-            try
-            {
-                var dbTestAssembly =
-                    await
-                        _context
-                            .TestAssembly
-                            .FirstOrDefaultAsync(
-                                o =>
-                                    EF.Functions.Like(
-                                        o.TestAssemblyName,
-                                        testAssembly.TestAssemblyName
-                                    )
-                            );
+            var dbTestAssembly =
+                await
+                    _context
+                        .TestAssembly
+                        .FirstOrDefaultAsync(
+                            o =>
+                                EF.Functions.Like(
+                                    o.TestAssemblyName,
+                                    testAssembly.TestAssemblyName
+                                )
+                        );
 
-                return dbTestAssembly;
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
+            return dbTestAssembly;
         }
     }
 }
