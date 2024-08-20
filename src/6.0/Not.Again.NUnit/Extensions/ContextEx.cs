@@ -5,7 +5,7 @@ using NUnit.Framework;
 
 namespace Not.Again.NUnit.Extensions
 {
-    public static class TestContextEx
+    public static class ContextEx
     {
         internal static RunCheckRequest ToRunCheckRequest(this TestContext context, int? rerunTestsOlderThanDays)
         {
