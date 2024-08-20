@@ -1,0 +1,53 @@
+name: docker publish api
+
+on:
+  release:
+    types: [ published ] 
+    tags:
+      - v*
+env:
+  IMAGE_NAME: not-again-api
+  USER_PATH: ${{ secrets.DOCKER_REPO_USER }}
+  HUB_FOLDER: ${{ secrets.DOCKER_HUB_FOLDER }}
+
+jobs:
+  # Run tests.
+  # See also https://docs.docker.com/docker-hub/builds/automated-testing/
+  # (TO DO)
+  
+  # Push image to GitHub Packages.
+  # See also https://docs.docker.com/docker-hub/builds/
+  publish:
+    runs-on: ubuntu-latest    
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Log into registry
+        run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login docker.io -u $USER_PATH --password-stdin
+        
+      - name: Build image
+        run: docker build --file ./src/6.0/Not.Again.Api.Host/Dockerfile --build-arg PAT=${{ secrets.PACKAGE_FEED_TOKEN }} --tag $IMAGE_NAME ./src #
+
+      - name: Push image
+        run: |
+          IMAGE_ID=docker.io/$HUB_FOLDER/$IMAGE_NAME          
+
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+
+          # Use Docker `latest` tag convention
+          [ "$VERSION" == "master" ] && VERSION=latest
+
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+
+          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+          docker tag $IMAGE_NAME $IMAGE_ID:latest
+          docker push $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:latest
