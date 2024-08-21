@@ -1,4 +1,4 @@
-name: nuget
+name: test
 
 on:
   push:
@@ -24,11 +24,3 @@ jobs:
       run: dotnet build $SOLUTION_PATH --no-restore --ignore-failed-sources /p:Version=$MAJOR_VERSION.$MINOR_VERSION.$GITHUB_RUN_NUMBER -c Release
     - name: Test
       run: dotnet test $SOLUTION_PATH --no-restore --verbosity normal
-    - name: Create output folder
-      run: mkdir ./output
-    - name: Consolidate packages (including symbols)
-      run: find . -name "*$MAJOR_VERSION.$MINOR_VERSION.$GITHUB_RUN_NUMBER.*nupkg" -type f -exec cp {} ./output \;
-    - name: Echo packages
-      run: find ./output -name "*.*nupkg" -type f -exec echo {} \;
-    - name: Push
-      run: find ./output -name "*.nupkg" -type f -exec dotnet nuget push "{}" --api-key ${{ secrets.NUGET_ORG_API_KEY }} --source "https://api.nuget.org/v3/index.json" \;
