@@ -6,10 +6,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="AutoFixture" Version="4.15.0" />
+        <PackageReference Include="AutoFixture.AutoMoq" Version="4.15.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration" Version="7.0.0" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.1.0"/>
+        <PackageReference Include="NUnit" Version="3.13.3" />
         <PackageReference Include="xunit" Version="2.4.1"/>
         <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -23,6 +26,8 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Not.Again.Api.Host\Not.Again.Api.Host.csproj" />
+      <ProjectReference Include="..\Not.Again.Enum\Not.Again.Enum.csproj" />
+      <ProjectReference Include="..\Not.Again.NUnit\Not.Again.NUnit.csproj" />
     </ItemGroup>
 
 </Project>

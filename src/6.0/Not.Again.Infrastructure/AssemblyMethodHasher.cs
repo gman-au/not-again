@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
@@ -11,12 +12,13 @@ namespace Not.Again.Infrastructure
     {
         public static long? CalculateTestMethodHash(
             string className,
-            string methodName
+            string methodName, 
+            Assembly[] assemblies = null
         )
         {
             var assembly =
                 AssemblyLoader
-                    .GetAssemblyFromClassName(className);
+                    .GetAssemblyFromClassName(className, assemblies);
 
             var methodDefinition =
                 GetMethodDefinitionFromAssembly(

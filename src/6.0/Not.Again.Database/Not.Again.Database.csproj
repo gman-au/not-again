@@ -28,6 +28,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Not.Again.Domain\Not.Again.Domain.csproj"/>
+        <ProjectReference Include="..\Not.Again.Infrastructure\Not.Again.Infrastructure.csproj" />
         <ProjectReference Include="..\Not.Again.Interfaces\Not.Again.Interfaces.csproj"/>
     </ItemGroup>
 

@@ -6,9 +6,10 @@ namespace Not.Again.Infrastructure
 {
     public static class AssemblyLoader
     {
-        public static Assembly GetAssemblyFromClassName(string className)
+        public static Assembly GetAssemblyFromClassName(string className, Assembly[] assemblies = null)
         {
             var referencedAssemblies =
+                assemblies ??
                 AppDomain
                     .CurrentDomain
                     .GetAssemblies();

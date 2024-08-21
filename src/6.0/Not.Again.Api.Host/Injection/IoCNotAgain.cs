@@ -18,6 +18,7 @@ namespace Not.Again.Api.Host.Injection
             services
                 .AddTransient<IResultSubmitter, ResultSubmitter>()
                 .AddTransient<ITestRecordGetter, TestRecordGetter>()
+                .AddTransient<ITestRunGetter, TestRunGetter>()
                 .AddTransient<ITestAssemblyGetter, TestAssemblyGetter>()
                 .AddTransient<IRunChecker, RunChecker>()
                 .AddTransient<IArgumentDelimiter, ArgumentDelimiter>()

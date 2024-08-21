@@ -49,7 +49,7 @@ namespace Not.Again.Infrastructure
             }
             catch (HttpRequestException)
             {
-                logAction("Warning - there was an error when attempting to connect to the API; please check your configuration.");
+                logAction(StandardMessages.GenericApiClientErrorMessage);
             }
 
             return new DiagnosticResponse
@@ -85,7 +85,7 @@ namespace Not.Again.Infrastructure
             }
             catch (HttpRequestException)
             {
-                logAction("Warning - there was an error when attempting to connect to the API; please check your configuration.");
+                logAction(StandardMessages.GenericApiClientErrorMessage);
             }
         }
 

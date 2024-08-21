@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Not.Again.Contracts;
 using Not.Again.Domain;
+using Not.Again.Infrastructure;
 using Not.Again.Interfaces;
 
 namespace Not.Again.Database
@@ -12,25 +13,25 @@ namespace Not.Again.Database
     public class RunChecker : IRunChecker
     {
         private readonly IArgumentDelimiter _argumentDelimiter;
-        private readonly NotAgainDbContext _context;
+        private readonly ILogger<RunChecker> _logger;
+        private readonly IMessageFormatter _messageFormatter;
         private readonly ITestAssemblyGetter _testAssemblyGetter;
         private readonly ITestRecordGetter _testRecordGetter;
-        private readonly IMessageFormatter _messageFormatter;
-        private readonly ILogger<RunChecker> _logger;
+        private readonly ITestRunGetter _testRunGetter;
 
         public RunChecker(
             ITestAssemblyGetter testAssemblyGetter,
             ITestRecordGetter testRecordGetter,
+            ITestRunGetter testRunGetter,
             IArgumentDelimiter argumentDelimiter,
-            NotAgainDbContext context, 
-            IMessageFormatter messageFormatter, 
+            IMessageFormatter messageFormatter,
             ILogger<RunChecker> logger
         )
         {
             _testAssemblyGetter = testAssemblyGetter;
             _testRecordGetter = testRecordGetter;
+            _testRunGetter = testRunGetter;
             _argumentDelimiter = argumentDelimiter;
-            _context = context;
             _messageFormatter = messageFormatter;
             _logger = logger;
         }
@@ -60,7 +61,11 @@ namespace Not.Again.Database
                     result.Message =
                         _messageFormatter
                             .EncapsulateNotAgainMessage(
-                                $"No prior record of this test assembly [{request.TestDetails.AssemblyQualifiedName}], the test [{request.TestDetails.FullName}] should NOT be ignored"
+                                string.Format(
+                                    StandardMessages.AssemblyNotFound,
+                                    request.TestDetails.AssemblyQualifiedName,
+                                    request.TestDetails.FullName
+                                )
                             );
 
                     return result;
@@ -91,7 +96,10 @@ namespace Not.Again.Database
                     result.Message =
                         _messageFormatter
                             .EncapsulateNotAgainMessage(
-                                $"The test [{request.TestDetails.FullName}] is either new or has been modified since last run - it should NOT be ignored"
+                                string.Format(
+                                    StandardMessages.RecordNotFound,
+                                    request.TestDetails.FullName
+                                )
                             );
 
                     return result;
@@ -99,21 +107,18 @@ namespace Not.Again.Database
 
                 var lastTestRun =
                     await
-                        _context
-                            .TestRun
-                            .Where(
-                                o =>
-                                    o.TestRecordId == dbTestRecord.TestRecordId
-                            )
-                            .OrderByDescending(o => o.RunDate)
-                            .FirstOrDefaultAsync();
+                        _testRunGetter
+                            .GetLastRunAsync(dbTestRecord.TestRecordId);
 
                 if (lastTestRun == null)
                 {
                     result.Message =
                         _messageFormatter
                             .EncapsulateNotAgainMessage(
-                                $"No prior test run found for this test record [{request.TestDetails.FullName}] - it should NOT be ignored"
+                                string.Format(
+                                    StandardMessages.RunNotFound,
+                                    request.TestDetails.FullName
+                                )
                             );
 
                     return result;
@@ -130,7 +135,13 @@ namespace Not.Again.Database
                         result.Message =
                             _messageFormatter
                                 .EncapsulateNotAgainMessage(
-                                    $"Last run for test [{request.TestDetails.FullName}] did not exceed the specified interval of {request.RerunTestsOlderThanDays.Value} days - it should be ignored"
+                                    string
+                                        .Format(
+                                            StandardMessages
+                                                .NewerRunFound,
+                                            request.TestDetails.FullName,
+                                            request.RerunTestsOlderThanDays.Value
+                                        )
                                 );
 
                         return result;
@@ -139,17 +150,34 @@ namespace Not.Again.Database
                     result.Message =
                         _messageFormatter
                             .EncapsulateNotAgainMessage(
-                                $"Last run for test [{request.TestDetails.FullName}] exceeded the specified interval of {request.RerunTestsOlderThanDays.Value} days - it should NOT be ignored"
+                                string
+                                    .Format(
+                                        StandardMessages
+                                            .OnlyOlderRunFound,
+                                        request.TestDetails.FullName,
+                                        request.RerunTestsOlderThanDays.Value
+                                    )
                             );
 
                     return result;
                 }
+
+                result.Message =
+                    _messageFormatter
+                        .EncapsulateNotAgainMessage(
+                            string
+                                .Format(
+                                    StandardMessages
+                                        .NoIntervalSpecifiedForFoundRun,
+                                    request.TestDetails.FullName
+                                )
+                        );
             }
             catch (Exception ex)
             {
                 _logger
                     .LogError(ex.Message);
-                
+
                 result.Message =
                     _messageFormatter
                         .EncapsulateNotAgainMessage(

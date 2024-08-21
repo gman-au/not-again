@@ -33,12 +33,13 @@ namespace Not.Again.Tests.Unit
 
         public void AssertResolvedServices()
         {
-            var resultSubmitter =
-                ServiceProvider
-                    .GetService<IResultSubmitter>();
-
             Assert
-                .NotNull(resultSubmitter);
+                .NotNull(ServiceProvider
+                    .GetService<IResultSubmitter>());
+            
+            Assert
+                .NotNull(ServiceProvider
+                    .GetService<IRunChecker>());
         }
 
         public void AssertConnectionStringException(Exception exception)
