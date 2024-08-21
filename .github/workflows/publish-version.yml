@@ -21,13 +21,10 @@ jobs:
     runs-on: ubuntu-latest    
     steps:
       - uses: actions/checkout@v2
-
       - name: Log into registry
         run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login docker.io -u $USER_PATH --password-stdin
-        
       - name: Build image
         run: docker build --file ./src/6.0/Not.Again.Api.Host/Dockerfile --build-arg PAT=${{ secrets.PACKAGE_FEED_TOKEN }} --tag $IMAGE_NAME ./src/6.0 #
-
       - name: Push image
         run: |
           IMAGE_ID=docker.io/$HUB_FOLDER/$IMAGE_NAME          
@@ -51,31 +48,31 @@ jobs:
           docker tag $IMAGE_NAME $IMAGE_ID:latest
           docker push $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:latest
-    nuget:
-        runs-on: ubuntu-latest
-        env:
-          SOLUTION_PATH: ./src/6.0
-        steps:
-        - uses: actions/checkout@v2
-        - name: Setup .NET
-          uses: actions/setup-dotnet@v1
-          with:
-            dotnet-version: 6.0.x        
-        - name: Restore dependencies
-          run: dotnet restore $SOLUTION_PATH
-        - name: Build
-          run: |
-            VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-            [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-            dotnet build $SOLUTION_PATH --no-restore --ignore-failed-sources /p:Version=$VERSION -c Release
-        - name: Create output folder
-          run: mkdir ./output
-        - name: Consolidate packages (including symbols)
-          run: |
-            VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-            [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-            find . -name "*$VERSION.*nupkg" -type f -exec cp {} ./output \;
-        - name: Echo packages
-          run: find ./output -name "*.*nupkg" -type f -exec echo {} \;
-        - name: Push
-          run: find ./output -name "*.nupkg" -type f -exec dotnet nuget push "{}" --api-key ${{ secrets.NUGET_ORG_API_KEY }} --source "https://api.nuget.org/v3/index.json" \;          
+  nuget:
+    runs-on: ubuntu-latest
+    env:
+      SOLUTION_PATH: ./src/6.0
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x        
+      - name: Restore dependencies
+        run: dotnet restore $SOLUTION_PATH
+      - name: Build
+        run: |
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          dotnet build $SOLUTION_PATH --no-restore --ignore-failed-sources /p:Version=$VERSION -c Release
+      - name: Create output folder
+        run: mkdir ./output
+      - name: Consolidate packages (including symbols)
+        run: |
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          find . -name "*$VERSION.*nupkg" -type f -exec cp {} ./output \;
+      - name: Echo packages
+        run: find ./output -name "*.*nupkg" -type f -exec echo {} \;
+      - name: Push
+        run: find ./output -name "*.nupkg" -type f -exec dotnet nuget push "{}" --api-key ${{ secrets.NUGET_ORG_API_KEY }} --source "https://api.nuget.org/v3/index.json" \;          
