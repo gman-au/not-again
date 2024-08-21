@@ -1,4 +1,4 @@
-name: publish
+name: publish version
 
 on:
   release:
@@ -65,16 +65,16 @@ jobs:
           run: dotnet restore $SOLUTION_PATH
         - name: Build
           run: |
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          dotnet build $SOLUTION_PATH --no-restore --ignore-failed-sources /p:Version=$VERSION -c Release
+            VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+            [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+            dotnet build $SOLUTION_PATH --no-restore --ignore-failed-sources /p:Version=$VERSION -c Release
         - name: Create output folder
           run: mkdir ./output
         - name: Consolidate packages (including symbols)
           run: |
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-          find . -name "*$VERSION.*nupkg" -type f -exec cp {} ./output \;
+            VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+            [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+            find . -name "*$VERSION.*nupkg" -type f -exec cp {} ./output \;
         - name: Echo packages
           run: find ./output -name "*.*nupkg" -type f -exec echo {} \;
         - name: Push
