@@ -14,7 +14,8 @@ namespace Not.Again.Database.Migrations.Migrations
                 columns: table => new
                 {
                     TestAssemblyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    TestAssemblyName = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: true)
+                    TestAssemblyName = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: true),
+                    TestRunner = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: true)
                 },
                 constraints: table =>
                 {

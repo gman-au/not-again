@@ -9,5 +9,7 @@ namespace Not.Again.Contracts
         public long Duration { get; set; }
 
         public DateTime RunDate { get; set; }
+        
+        public string TestRunner { get; set; }
     }
 }

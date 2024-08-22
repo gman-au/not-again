@@ -12,6 +12,7 @@
         public const string RunNotFound = "No prior test run found for this test record [{0}] - it should NOT be ignored";
         public const string NewerRunFound = "Last run for test [{0}] did not exceed the specified interval of {1} days - it should be ignored";
         public const string OnlyOlderRunFound = "Last run for test [{0}] exceeded the specified interval of {1} days - it should NOT be ignored";
+        public const string LastRunFailed = "Last run for test [{0}] failed - it should NOT be ignored";
         public const string NoIntervalSpecifiedForFoundRun = "No re-run interval was specified in the request for test [{0}] - it should NOT be ignored";
     }
 }
