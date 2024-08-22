@@ -32,6 +32,10 @@ namespace Not.Again.Database.Migrations.Migrations
                         .HasMaxLength(512)
                         .HasColumnType("nvarchar(512)");
 
+                    b.Property<string>("TestRunner")
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
                     b.HasKey("TestAssemblyId");
 
                     b.ToTable("TestAssembly");
@@ -103,7 +107,7 @@ namespace Not.Again.Database.Migrations.Migrations
             modelBuilder.Entity("Not.Again.Domain.TestRecord", b =>
                 {
                     b.HasOne("Not.Again.Domain.TestAssembly", "TestAssembly")
-                        .WithMany()
+                        .WithMany("TestRecords")
                         .HasForeignKey("TestAssemblyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -114,12 +118,22 @@ namespace Not.Again.Database.Migrations.Migrations
             modelBuilder.Entity("Not.Again.Domain.TestRun", b =>
                 {
                     b.HasOne("Not.Again.Domain.TestRecord", "TestRecord")
-                        .WithMany()
+                        .WithMany("TestRuns")
                         .HasForeignKey("TestRecordId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("TestRecord");
+                });
+
+            modelBuilder.Entity("Not.Again.Domain.TestAssembly", b =>
+                {
+                    b.Navigation("TestRecords");
+                });
+
+            modelBuilder.Entity("Not.Again.Domain.TestRecord", b =>
+                {
+                    b.Navigation("TestRuns");
                 });
 #pragma warning restore 612, 618
         }

@@ -12,7 +12,7 @@ using Not.Again.Database.Migrations;
 namespace Not.Again.Database.Migrations.Migrations
 {
     [DbContext(typeof(MigrationContext))]
-    [Migration("20240820031016_Initial")]
+    [Migration("20240822051235_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,6 +33,10 @@ namespace Not.Again.Database.Migrations.Migrations
                     b.Property<string>("TestAssemblyName")
                         .HasMaxLength(512)
                         .HasColumnType("nvarchar(512)");
+
+                    b.Property<string>("TestRunner")
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
 
                     b.HasKey("TestAssemblyId");
 
@@ -105,7 +109,7 @@ namespace Not.Again.Database.Migrations.Migrations
             modelBuilder.Entity("Not.Again.Domain.TestRecord", b =>
                 {
                     b.HasOne("Not.Again.Domain.TestAssembly", "TestAssembly")
-                        .WithMany()
+                        .WithMany("TestRecords")
                         .HasForeignKey("TestAssemblyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -116,12 +120,22 @@ namespace Not.Again.Database.Migrations.Migrations
             modelBuilder.Entity("Not.Again.Domain.TestRun", b =>
                 {
                     b.HasOne("Not.Again.Domain.TestRecord", "TestRecord")
-                        .WithMany()
+                        .WithMany("TestRuns")
                         .HasForeignKey("TestRecordId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("TestRecord");
+                });
+
+            modelBuilder.Entity("Not.Again.Domain.TestAssembly", b =>
+                {
+                    b.Navigation("TestRecords");
+                });
+
+            modelBuilder.Entity("Not.Again.Domain.TestRecord", b =>
+                {
+                    b.Navigation("TestRuns");
                 });
 #pragma warning restore 612, 618
         }

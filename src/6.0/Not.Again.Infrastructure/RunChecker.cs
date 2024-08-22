@@ -1,23 +1,21 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Not.Again.Contracts;
 using Not.Again.Domain;
-using Not.Again.Infrastructure;
+using Not.Again.Enum;
 using Not.Again.Interfaces;
 
-namespace Not.Again.Database
+namespace Not.Again.Infrastructure
 {
     public class RunChecker : IRunChecker
     {
         private readonly IArgumentDelimiter _argumentDelimiter;
-        private readonly ILogger<RunChecker> _logger;
         private readonly IMessageFormatter _messageFormatter;
         private readonly ITestAssemblyGetter _testAssemblyGetter;
         private readonly ITestRecordGetter _testRecordGetter;
         private readonly ITestRunGetter _testRunGetter;
+        private readonly ILogger<RunChecker> _logger;
 
         public RunChecker(
             ITestAssemblyGetter testAssemblyGetter,
@@ -119,6 +117,22 @@ namespace Not.Again.Database
                                     StandardMessages.RunNotFound,
                                     request.TestDetails.FullName
                                 )
+                            );
+
+                    return result;
+                }
+
+                if (lastTestRun.Result != (int)TestResultEnum.Passed)
+                {
+                    result.Message =
+                        _messageFormatter
+                            .EncapsulateNotAgainMessage(
+                                string
+                                    .Format(
+                                        StandardMessages
+                                            .LastRunFailed,
+                                        request.TestDetails.FullName
+                                    )
                             );
 
                     return result;

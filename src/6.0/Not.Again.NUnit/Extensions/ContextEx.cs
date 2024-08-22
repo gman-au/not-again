@@ -63,7 +63,7 @@ namespace Not.Again.NUnit.Extensions
                 TestName = test.Name,
                 Arguments = test.Arguments,
                 Hash = hash.GetValueOrDefault(0),
-                AssemblyQualifiedName = assemblyQualifiedName,
+                AssemblyQualifiedName = assemblyQualifiedName
             };
         }
 
@@ -75,7 +75,8 @@ namespace Not.Again.NUnit.Extensions
             {
                 Status = (int)result.Outcome.Status,
                 Duration = totalMilliseconds,
-                RunDate = DateTime.UtcNow
+                RunDate = DateTime.UtcNow,
+                TestRunner = StandardConstants.NUnitRunnerType
             };
         }
     }

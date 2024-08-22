@@ -17,9 +17,12 @@ namespace Not.Again.Api.Host.Injection
         {
             services
                 .AddTransient<IResultSubmitter, ResultSubmitter>()
+                .AddTransient<ITestAssemblyGetter, TestAssemblyGetter>()
                 .AddTransient<ITestRecordGetter, TestRecordGetter>()
                 .AddTransient<ITestRunGetter, TestRunGetter>()
-                .AddTransient<ITestAssemblyGetter, TestAssemblyGetter>()
+                .AddTransient<ITestAssemblyPutter, TestAssemblyPutter>()
+                .AddTransient<ITestRecordPutter, TestRecordPutter>()
+                .AddTransient<ITestRunPutter, TestRunPutter>()
                 .AddTransient<IRunChecker, RunChecker>()
                 .AddTransient<IArgumentDelimiter, ArgumentDelimiter>()
                 .AddTransient<IMessageFormatter, MessageFormatter>();

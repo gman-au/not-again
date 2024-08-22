@@ -7,9 +7,9 @@ using AutoFixture.AutoMoq;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Not.Again.Contracts;
-using Not.Again.Database;
 using Not.Again.Domain;
 using Not.Again.Enum;
+using Not.Again.Infrastructure;
 using Not.Again.Interfaces;
 
 namespace Not.Again.Tests.Unit
@@ -100,8 +100,23 @@ namespace Not.Again.Tests.Unit
             _context.AssertAssemblyWasFound();
             _context.AssertRecordWasFound();
             _context.AssertRunWasFound();
-            _context.AssertNewerRunFound();
+            _context.AssertNewerPassedRunFound();
             _context.AssertTestIgnored();
+        }
+
+        [Fact]
+        public async Task Request_Is_Assembly_Is_Record_Is_Run_Is_Failed_New_Check()
+        {
+            _context.ArrangeRequest();
+            _context.ArrangeAssemblyFound();
+            _context.ArrangeTestRecordFound();
+            _context.ArrangeTestRunNewerFailedFound();
+            await _context.ActRunCheckAsync();
+            _context.AssertAssemblyWasFound();
+            _context.AssertRecordWasFound();
+            _context.AssertRunWasFound();
+            _context.AssertNewerFailedRunFound();
+            _context.AssertTestNotIgnored();
         }
 
         [Fact]
@@ -271,6 +286,26 @@ namespace Not.Again.Tests.Unit
                     .ReturnsAsync(testRecord);
             }
 
+            public void ArrangeTestRunNewerFailedFound()
+            {
+                var testRun =
+                    _fixture
+                        .Build<TestRun>()
+                        .With(
+                            o => o.RunDate,
+                            DateTime.UtcNow.AddDays(-10)
+                        )
+                        .With(
+                            o => o.Result,
+                            (int)TestResultEnum.Failed
+                        )
+                        .Create();
+
+                _testRunGetter
+                    .Setup(o => o.GetLastRunAsync(It.IsAny<Guid>()))
+                    .ReturnsAsync(testRun);
+            }
+
             public void ArrangeTestRunNewerPassedFound()
             {
                 var testRun =
@@ -410,12 +445,22 @@ namespace Not.Again.Tests.Unit
                     );
             }
 
-            public void AssertNewerRunFound()
+            public void AssertNewerPassedRunFound()
             {
                 _messageFormatter
                     .Verify(
                         o => o.EncapsulateNotAgainMessage(
                             "Last run for test [MyTestName] did not exceed the specified interval of 20 days - it should be ignored"
+                        ), Times.Once
+                    );
+            }
+
+            public void AssertNewerFailedRunFound()
+            {
+                _messageFormatter
+                    .Verify(
+                        o => o.EncapsulateNotAgainMessage(
+                            "Last run for test [MyTestName] failed - it should NOT be ignored"
                         ), Times.Once
                     );
             }
