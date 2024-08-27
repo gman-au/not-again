@@ -3,7 +3,8 @@ name: siren-gen
 on:
   workflow_dispatch:
   push:
-    branches: [ master ]  
+    branches-ignore:
+      - master
     paths:
       - '**/Migrations/**'
 jobs:
