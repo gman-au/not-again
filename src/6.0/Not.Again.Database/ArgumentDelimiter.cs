@@ -12,7 +12,7 @@ namespace Not.Again.Database
                 string
                     .Join(
                         "|",
-                        arguments
+                        (arguments ?? Enumerable.Empty<object>())
                             .Select(o => o.ToString())
                             .OrderBy(o => o)
                     );
