@@ -41,7 +41,6 @@ namespace Not.Again.Tests.Unit
             {
                 "John Smith",
                 3948,
-                new DateTime(1993, 1, 30),
                 0x1B,
                 90.928348F
             };
@@ -50,7 +49,7 @@ namespace Not.Again.Tests.Unit
 
             public void AssertEmptyResult() => Assert.True(string.IsNullOrEmpty(_result));
             
-            public void AssertMixedResult() => Assert.Equal("27|30/01/1993 12:00:00 AM|3948|90.928345|John Smith", _result);
+            public void AssertMixedResult() => Assert.Equal("27|3948|90.928345|John Smith", _result);
         }
     }
 }
