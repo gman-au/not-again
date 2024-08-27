@@ -1,0 +1,43 @@
+name: siren-gen
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master ]  
+    paths:
+      - '**/Migrations/**'
+jobs:
+  siren-gen:
+    runs-on: ubuntu-latest
+    env:
+      MAJOR_VERSION: 6
+      MINOR_VERSION: 0
+      SOLUTION_PATH: ./src/6.0/
+      MIGRATION_DLL: Not.Again.Database.Migrations.dll
+      MARKDOWN_ANCHOR: "# Domain model"
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.x  
+    - name: Install siren-gen tool
+      run: dotnet tool install -g Gman.Siren  
+    - name: Restore dependencies
+      run: dotnet restore $SOLUTION_PATH
+    - name: Build
+      run: dotnet publish $SOLUTION_PATH --no-restore --ignore-failed-sources -c Release      
+    - name: Create output folder
+      run: mkdir ./output
+    - name: Consolidate packages (including symbols)
+      run: find . -name "*.dll" -type f -exec cp {} ./output \;
+    - name: Echo packages
+      run: find ./output -name "*.dll" -type f -exec echo {} \;
+    - name: Run siren-gen on ModelSnapshot
+      run: siren-gen "./output/$MIGRATION_DLL" "README.md" "$MARKDOWN_ANCHOR"
+    - name: Commit README
+      run: |
+        git config user.email "info@gman.com.au"
+        git config user.name "G-MAN Support"
+        git commit README.md -m "Updated README (siren-gen)" || echo "No changes to commit"
+        git push origin || echo "No changes to commit"
