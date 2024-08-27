@@ -1,5 +1,35 @@
 # not-again
-<p align="center">
+<<!--- SIREN_START -->
+```mermaid
+	%%{init: {'theme':'neutral'}}%%
+	erDiagram
+	TestAssembly {
+		uniqueidentifier TestAssemblyId PK
+		nvarchar512 TestAssemblyName 
+		nvarchar32 TestRunner 
+	}
+	TestRecord {
+		uniqueidentifier TestRecordId PK
+		nvarchar256 ClassName 
+		nvarcharmax DelimitedTestArguments 
+		nvarchar256 FullName 
+		bigint LastHash 
+		nvarchar256 MethodName 
+		uniqueidentifier TestAssemblyId FK
+		nvarchar256 TestName 
+	}
+	TestRun {
+		uniqueidentifier TestRunId PK
+		int Result 
+		datetime2 RunDate 
+		uniqueidentifier TestRecordId FK
+		bigint TotalDuration 
+	}
+TestRecord}o--||TestAssembly : ""
+TestRun}o--||TestRecord : ""
+```
+<!--- SIREN_END -->
+p align="center">
 <img style="border-radius:10px;" width="400" src="https://github.com/user-attachments/assets/adc7e768-44fe-4965-8884-0f1ac9447bb0" />
 </p>
 
