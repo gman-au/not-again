@@ -57,6 +57,36 @@ sequenceDiagram
     Note left of My Test: Skip the test
 ```
 
+# Domain model<!--- SIREN_START -->
+```mermaid
+	%%{init: {'theme':'neutral'}}%%
+	erDiagram
+	TestAssembly {
+		uniqueidentifier TestAssemblyId PK
+		nvarchar512 TestAssemblyName 
+		nvarchar32 TestRunner 
+	}
+	TestRecord {
+		uniqueidentifier TestRecordId PK
+		nvarchar256 ClassName 
+		nvarcharmax DelimitedTestArguments 
+		nvarchar256 FullName 
+		bigint LastHash 
+		nvarchar256 MethodName 
+		uniqueidentifier TestAssemblyId FK
+		nvarchar256 TestName 
+	}
+	TestRun {
+		uniqueidentifier TestRunId PK
+		int Result 
+		datetime2 RunDate 
+		uniqueidentifier TestRecordId FK
+		bigint TotalDuration 
+	}
+TestRecord}o--||TestAssembly : ""
+TestRun}o--||TestRecord : ""
+```
+<!--- SIREN_END -->
 
 
 # Installation / usage
