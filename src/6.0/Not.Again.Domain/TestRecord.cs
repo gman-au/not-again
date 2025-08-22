@@ -30,7 +30,5 @@ namespace Not.Again.Domain
         public string DelimitedTestArguments { get; set; }
 
         public long LastHash { get; set; }
-        
-        public virtual IList<TestRun> TestRuns { get; set; }
     }
 }

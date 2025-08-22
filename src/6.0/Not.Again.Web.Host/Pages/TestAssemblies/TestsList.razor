@@ -6,15 +6,20 @@
 @inject ITestRecordAggregator Aggregator
 <PageTitle>Test Explorer</PageTitle>
 
-<h3>Test Explorer</h3>
+<h4>Tests</h4>
+<hr/>
 
 @if (TestDetails.Any())
 {
     <ul>
-    @foreach (var testDetails in TestDetails)
-    {
-        <li>@testDetails.TestName</li>
-    }
+        @foreach (var testDetails in TestDetails)
+        {
+            <li>
+                <NavLink class="nav-link" href="@($"testRuns/{AssemblyId}/{testDetails.Id}")">
+                    @testDetails.TestName
+                </NavLink>
+            </li>
+        }
     </ul>
 }
 else
@@ -24,8 +29,7 @@ else
 
 @code {
 
-    [Parameter]
-    public string AssemblyId { get; set; }
+    [Parameter] public string AssemblyId { get; set; }
 
     private IEnumerable<TestDetails> TestDetails { get; set; } = new List<TestDetails>();
 
@@ -34,11 +38,12 @@ else
         Guid.TryParse(AssemblyId, out var assemblyId);
         Guid? parameter = assemblyId == Guid.Empty ? null : assemblyId;
 
-            var testRecords =
-                await
-                    Aggregator
-                        .GetTestRecordsAsync(parameter, CancellationToken.None);
+        var testRecords =
+            await
+                Aggregator
+                    .GetTestRecordsAsync(parameter, CancellationToken.None);
 
-            TestDetails = testRecords?.TestRecords ?? Enumerable.Empty<TestDetails>();
-        }
+        TestDetails = testRecords?.TestRecords ?? Enumerable.Empty<TestDetails>();
     }
+
+}

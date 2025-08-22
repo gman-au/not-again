@@ -1,0 +1,56 @@
+﻿@page "/testRuns"
+@page "/testRuns/{AssemblyId}"
+@page "/testRuns/{AssemblyId}/{TestRecordId}"
+@using System.Threading
+@using Not.Again.Contracts
+@using Not.Again.Web.Host.Infrastructure
+@inject ITestRunAggregator Aggregator
+<PageTitle>Test Explorer</PageTitle>
+
+<h4>Test Runs</h4>
+<hr/>
+
+@if (TestRuns.Any())
+{
+    <ul>
+    @foreach (var testRun in TestRuns)
+    {
+        <li>@testRun.TestName, @testRun.RunDate, @testRun.Status</li>
+    }
+    </ul>
+}
+else
+{
+    <p>No test assemblies have been found.</p>
+}
+
+@code {
+
+    [Parameter]
+    public string AssemblyId { get; set; }
+
+    [Parameter]
+    public string TestRecordId { get; set; }
+
+    private IEnumerable<ReportableTestRun> TestRuns { get; set; } = new List<ReportableTestRun>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Guid.TryParse(AssemblyId, out var assemblyId);
+        Guid.TryParse(TestRecordId, out var testRecordId);
+
+        Guid? assemblyIdParameter = assemblyId == Guid.Empty ? null : assemblyId;
+        Guid? testRecordIdParameter = testRecordId == Guid.Empty ? null : testRecordId;
+
+            var testRuns =
+                await
+                    Aggregator
+                        .GetTestRunsAsync(
+                            assemblyIdParameter,
+                            testRecordIdParameter,
+                            CancellationToken.None
+                            );
+
+            TestRuns = testRuns.TestRuns ?? Enumerable.Empty<ReportableTestRun>();
+        }
+    }

@@ -14,7 +14,8 @@ namespace Not.Again.Web.Host.Injection
             services
                 .AddTransient<IApiAdapter, ApiAdapter>()
                 .AddTransient<ITestAssemblyAggregator, TestAssemblyAggregator>()
-                .AddTransient<ITestRecordAggregator, TestRecordAggregator>();
+                .AddTransient<ITestRecordAggregator, TestRecordAggregator>()
+                .AddTransient<ITestRunAggregator, TestRunAggregator>();
 
             services
                 .Configure<WebHostConfigurationOptions>(

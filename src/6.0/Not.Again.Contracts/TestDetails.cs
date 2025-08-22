@@ -19,5 +19,7 @@ namespace Not.Again.Contracts
         public IEnumerable<object> Arguments { get; set; }
 
         public long Hash { get; set; }
+
+        public IEnumerable<TestResultDetails> TestResults { get; set; }
     }
 }
