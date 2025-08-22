@@ -1,166 +1,98 @@
-﻿<BarChart @ref="barChart" Width="500" Height="300" />
-
-<div class="mt-5">
-    <Button Type="ButtonType.Button" Color="ButtonColor.Primary" Size="ButtonSize.Small" @onclick="async () => await RandomizeAsync()"> Randomize </Button>
-    <Button Type="ButtonType.Button" Color="ButtonColor.Primary" Size="ButtonSize.Small" @onclick="async () => await AddDatasetAsync()"> Add Dataset </Button>
-    <Button Type="ButtonType.Button" Color="ButtonColor.Primary" Size="ButtonSize.Small" @onclick="async () => await AddDataAsync()">Add Data</Button>
-    <Button Type="ButtonType.Button" Color="ButtonColor.Primary" Size="ButtonSize.Small" @onclick="async () => await ShowHorizontalBarChartAsync()">Horizontal Bar Chart</Button>
-    <Button Type="ButtonType.Button" Color="ButtonColor.Primary" Size="ButtonSize.Small" @onclick="async () => await ShowVerticalBarChartAsync()">Vertical Bar Chart</Button>
-</div>
+﻿@using Not.Again.Contracts
+@using Not.Again.Enum
+<BarChart @ref="_barChart" Width="500" Height="300" />
 
 @code {
-    private BarChart barChart = default!;
-    private BarChartOptions barChartOptions = default!;
-    private ChartData chartData = default!;
+    [Parameter]
+    public IEnumerable<ReportableTestRun> TestRuns { get; set; }
 
-    private int datasetsCount = 0;
-    private int labelsCount = 0;
-    private string[] months = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
-    private Random random = new();
+    private BarChart _barChart = null!;
+    private BarChartOptions _barChartOptions = null!;
+    private ChartData _chartData = null!;
 
     protected override void OnInitialized()
     {
-        chartData = new ChartData { Labels = GetDefaultDataLabels(6), Datasets = GetDefaultDataSets(3) };
-        barChartOptions = new BarChartOptions { Responsive = true, Interaction = new Interaction { Mode = InteractionMode.Index } };
+        if (!(TestRuns ?? Enumerable.Empty<ReportableTestRun>()).Any())
+            return;
+
+        var colors = ColorUtility.CategoricalSixColors;
+
+        var labels =
+            TestRuns
+                .Select(o => o.RunDate.ToString("d"))
+                .Distinct()
+                .ToList();
+
+        var datasets = new List<IChartDataset>();
+
+        // for each test run, build a data set
+        var distinctTestIds =
+            TestRuns
+                .Select(o => o.TestId)
+                .Distinct()
+                .ToList();
+
+        var colorIndex = 0;
+        // iterate through tests
+        foreach (var testId in distinctTestIds)
+        {
+            var test =
+                TestRuns
+                    .FirstOrDefault(o => o.TestId == testId);
+
+            var testName =
+                test?
+                    .TestName;
+
+            var seriesData = new List<double?>();
+
+            // iterate through distinct dates
+            foreach (var label in labels)
+            {
+                var testPassesOnThisDate =
+                    TestRuns
+                        .Where(o => o.RunDate.ToString("d") == label)
+                        .Count(o => o.Status == (int)TestResultEnum.Passed);
+
+                seriesData
+                    .Add(testPassesOnThisDate);
+            }
+
+            datasets.Add(new BarChartDataset
+            {
+                Label = testName,
+                Data = seriesData,
+                BackgroundColor = new List<string> { colors[colorIndex] },
+                BorderColor = new List<string> { colors[colorIndex] },
+                BorderWidth = new List<double> { 0 },
+            });
+
+            colorIndex = (colorIndex + 1) % 6;
+        }
+
+        _chartData = new ChartData { Labels = labels, Datasets = datasets };
+
+        _barChartOptions = new();
+        _barChartOptions.Responsive = true;
+        _barChartOptions.Interaction = new Interaction { Mode = InteractionMode.Y };
+        _barChartOptions.IndexAxis = "x";
+
+        _barChartOptions.Scales.Y!.Title = new ChartAxesTitle { Text = "Count", Display = true };
+        _barChartOptions.Scales.X!.Title = new ChartAxesTitle { Text = "Test", Display = true };
+
+        _barChartOptions.Scales.X.Stacked = true;
+        _barChartOptions.Scales.Y.Stacked = true;
+
+        _barChartOptions.Plugins.Title!.Text = "Test runs";
+        _barChartOptions.Plugins.Title.Display = true;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await barChart.InitializeAsync(chartData, barChartOptions);
+            await _barChart.InitializeAsync(_chartData, _barChartOptions);
         }
         await base.OnAfterRenderAsync(firstRender);
     }
-
-    private async Task RandomizeAsync()
-    {
-        if (chartData is null || chartData.Datasets is null || !chartData.Datasets.Any()) return;
-
-        var newDatasets = new List<IChartDataset>();
-
-        foreach (var dataset in chartData.Datasets)
-        {
-            if (dataset is BarChartDataset barChartDataset
-                && barChartDataset is not null
-                && barChartDataset.Data is not null)
-            {
-                var count = barChartDataset.Data.Count;
-
-                var newData = new List<double?>();
-                for (var i = 0; i < count; i++)
-                {
-                    newData.Add(random.Next(200));
-                }
-
-                barChartDataset.Data = newData;
-                newDatasets.Add(barChartDataset);
-            }
-        }
-
-        chartData.Datasets = newDatasets;
-
-        await barChart.UpdateAsync(chartData, barChartOptions);
-    }
-
-    private async Task AddDatasetAsync()
-    {
-        if (chartData is null || chartData.Datasets is null) return;
-
-        if (datasetsCount >= 12)
-            return;
-
-        var chartDataset = GetRandomBarChartDataset();
-        chartData = await barChart.AddDatasetAsync(chartData, chartDataset, barChartOptions);
-    }
-
-    private async Task AddDataAsync()
-    {
-        if (chartData is null || chartData.Datasets is null)
-            return;
-
-        if (labelsCount >= 12)
-            return;
-
-        var data = new List<IChartDatasetData>();
-        foreach (var dataset in chartData.Datasets)
-        {
-            if (dataset is BarChartDataset barChartDataset)
-                data.Add(new BarChartDatasetData(barChartDataset.Label, random.Next(200)));
-        }
-
-        chartData = await barChart.AddDataAsync(chartData, GetNextDataLabel(), data);
-    }
-
-    private async Task ShowHorizontalBarChartAsync()
-    {
-        barChartOptions.IndexAxis = "y";
-        await barChart.UpdateAsync(chartData, barChartOptions);
-    }
-
-    private async Task ShowVerticalBarChartAsync()
-    {
-        barChartOptions.IndexAxis = "x";
-        await barChart.UpdateAsync(chartData, barChartOptions);
-    }
-
-    #region Data Preparation
-
-    private List<IChartDataset> GetDefaultDataSets(int numberOfDatasets)
-    {
-        var datasets = new List<IChartDataset>();
-
-        for (var index = 0; index < numberOfDatasets; index++)
-        {
-            datasets.Add(GetRandomBarChartDataset());
-        }
-
-        return datasets;
-    }
-
-    private BarChartDataset GetRandomBarChartDataset()
-    {
-        var c = ColorUtility.CategoricalTwelveColors[datasetsCount].ToColor();
-
-        datasetsCount += 1;
-
-        return new BarChartDataset()
-            {
-                Label = $"Product {datasetsCount}",
-                Data = GetRandomData(),
-                BackgroundColor = new List<string> { c.ToRgbString() },
-                BorderColor = new List<string> { c.ToRgbString() },
-                BorderWidth = new List<double> { 0 },
-            };
-    }
-
-    private List<double?> GetRandomData()
-    {
-        var data = new List<double?>();
-        for (var index = 0; index < labelsCount; index++)
-        {
-            data.Add(random.Next(200));
-        }
-
-        return data;
-    }
-
-    private List<string> GetDefaultDataLabels(int numberOfLabels)
-    {
-        var labels = new List<string>();
-        for (var index = 0; index < numberOfLabels; index++)
-        {
-            labels.Add(GetNextDataLabel());
-        }
-
-        return labels;
-    }
-
-    private string GetNextDataLabel()
-    {
-        labelsCount += 1;
-        return months[labelsCount - 1];
-    }
-
-    #endregion Data Preparation
 }

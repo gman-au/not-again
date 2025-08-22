@@ -10,6 +10,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Not.Again.Contracts\Not.Again.Contracts.csproj" />
+      <ProjectReference Include="..\Not.Again.Enum\Not.Again.Enum.csproj" />
     </ItemGroup>
 
     <ItemGroup>
