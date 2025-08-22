@@ -20,4 +20,8 @@
       <ProjectReference Include="..\Not.Again.NUnit\Not.Again.NUnit.csproj" />
     </ItemGroup>
 
+    <PropertyGroup>
+        <RunSettingsFilePath>$(MSBuildProjectDirectory)\TestSettings.runsettings</RunSettingsFilePath>
+    </PropertyGroup>
+
 </Project>
