@@ -1,10 +1,11 @@
 using System.Threading;
 using System.Threading.Tasks;
+using Not.Again.Contracts;
 
 namespace Not.Again.Web.Host.Infrastructure
 {
     public interface ITestRunAggregator
     {
-        Task GetTestResultsAsync(CancellationToken cancellationToken);
+        Task<GetAssembliesResponse> GetAllTestAssembliesAsync(CancellationToken cancellationToken);
     }
 }

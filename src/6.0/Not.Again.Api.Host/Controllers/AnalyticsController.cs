@@ -1,6 +1,10 @@
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Not.Again.Api.Host.Extensions;
+using Not.Again.Contracts;
+using Not.Again.Interfaces;
 
 namespace Not.Again.Api.Host.Controllers
 {
@@ -9,23 +13,41 @@ namespace Not.Again.Api.Host.Controllers
     public class AnalyticsController : ControllerBase
     {
         private readonly ILogger<AnalyticsController> _logger;
+        private readonly ITestAssemblyGetter _testAssemblyGetter;
 
         public AnalyticsController(
-            ILogger<AnalyticsController> logger
-        )
+            ILogger<AnalyticsController> logger,
+            ITestAssemblyGetter testAssemblyGetter)
         {
             _logger = logger;
+            _testAssemblyGetter = testAssemblyGetter;
         }
 
-        [HttpPost("GetAssemblies")]
-        public async Task<ActionResult> GetAssemblies()
+        [HttpGet("GetAssemblies")]
+        public async Task<GetAssembliesResponse> GetAssemblies()
         {
             _logger
                 .LogInformation("GetAssemblies received");
 
-            var result = "OK";
+            var assemblies =
+                await
+                    _testAssemblyGetter
+                        .GetAsync();
 
-            return new OkObjectResult(result);
+            var result = new GetAssembliesResponse
+            {
+                Assemblies =
+                    assemblies
+                        .Select(o => new TestAssemblyRecord
+                        {
+                            TestAssemblyId = o.TestAssemblyId,
+                            TestAssemblyShortName = o.TestAssemblyName.ToShortName()
+                        })
+                        .ToList()
+            };
+
+            return
+                result;
         }
     }
 }

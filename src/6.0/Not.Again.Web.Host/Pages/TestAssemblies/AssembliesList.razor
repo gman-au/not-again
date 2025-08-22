@@ -1,0 +1,38 @@
+﻿@page "/assemblies"
+@using System.Threading
+@using Not.Again.Contracts
+@using Not.Again.Web.Host.Infrastructure
+@inject ITestRunAggregator TestRunAggregator
+<PageTitle>Test Explorer</PageTitle>
+
+<h3>Test Explorer</h3>
+
+@if (TestAssemblies.Any())
+{
+    <ul>
+    @foreach (var testAssembly in TestAssemblies)
+    {
+        <li>@testAssembly.TestAssemblyShortName</li>
+    }
+    </ul>
+}
+else
+{
+    <p>No test assemblies have been found.</p>
+}
+
+@code {
+
+    private IEnumerable<TestAssemblyRecord> TestAssemblies { get; set; } = new List<TestAssemblyRecord>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var testAssemblies =
+            await
+                TestRunAggregator
+                    .GetAllTestAssembliesAsync(CancellationToken.None);
+
+        TestAssemblies = testAssemblies?.Assemblies ?? Enumerable.Empty<TestAssemblyRecord>();
+    }
+
+}

@@ -1,6 +1,6 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Not.Again.Contracts;
 
 namespace Not.Again.Web.Host.Infrastructure
 {
@@ -13,9 +13,14 @@ namespace Not.Again.Web.Host.Infrastructure
             _apiAdapter = apiAdapter;
         }
 
-        public Task GetTestResultsAsync(CancellationToken cancellationToken)
+        public async Task<GetAssembliesResponse> GetAllTestAssembliesAsync(CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var response =
+                await
+                    _apiAdapter
+                        .HttpGetAsync<GetAssembliesResponse>("Analytics/GetAssemblies", cancellationToken);
+
+            return response;
         }
     }
 }

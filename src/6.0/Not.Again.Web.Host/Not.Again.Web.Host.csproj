@@ -8,4 +8,8 @@
       <Folder Include="Data\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\Not.Again.Contracts\Not.Again.Contracts.csproj" />
+    </ItemGroup>
+
 </Project>

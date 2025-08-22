@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
@@ -32,11 +31,46 @@ namespace Not.Again.Web.Host.Infrastructure
         }
 
         public async Task<TResponse> HttpPostAsync<TRequest, TResponse>(
+            string path,
             TRequest request = default,
             CancellationToken cancellationToken = default)
         {
+            var jsonString =
+                JsonSerializer
+                    .Serialize(request, _serializerOptions);
+
+            var response =
+                await
+                    HttpSendAsync<TResponse>
+                    (path,
+                        (c, t) => c.PostAsync(
+                            path,
+                            new StringContent(jsonString, Encoding.Default, "application/json"),
+                            t),
+                        cancellationToken);
+
+            return response;
+        }
+
+        public async Task<TResponse> HttpGetAsync<TResponse>(string path, CancellationToken cancellationToken = default)
+        {
+            var response =
+                await
+                    HttpSendAsync<TResponse>
+                    (path,
+                        (c, t) => c.GetAsync(path, t),
+                        cancellationToken);
+
+            return response;
+        }
+
+        private async Task<TResponse> HttpSendAsync<TResponse>(
+            string path,
+            Func<HttpClient, CancellationToken, Task<HttpResponseMessage>> httpFunc,
+            CancellationToken cancellationToken = default)
+        {
             _logger
-                .LogInformation("Sending Test Runs API request");
+                .LogInformation("Sending API request: {path}", path);
 
             try
             {
@@ -48,31 +82,25 @@ namespace Not.Again.Web.Host.Infrastructure
                         throw new Exception(
                             "Configuration error: [WebHostConfigurationOptions -> ApiEndpoint] not defined; check configuration."));
 
-                var jsonString =
-                    JsonSerializer
-                        .Serialize(request, _serializerOptions);
-
                 var httpResponse =
                     await
-                        httpClient
-                            .PostAsync(
-                                "/Diagnostic/RunCheck",
-                                new StringContent(jsonString, Encoding.Default, "application/json"),
-                                cancellationToken
-                            );
+                        httpFunc(httpClient, cancellationToken);
+
+                httpResponse
+                    .EnsureSuccessStatusCode();
 
                 var serializedResponse =
                     await
                         httpResponse
                             .Content
-                            .ReadFromJsonAsync<TResponse>(_serializerOptions, cancellationToken);
+                            .ReadFromJsonAsync<TResponse>(cancellationToken: cancellationToken);
 
                 return serializedResponse;
             }
             catch (Exception ex)
             {
                 _logger
-                    .LogError("Error sending Test Runs API request: {message}",  ex.Message);
+                    .LogError("Error sending API request: {path}: {message}", path, ex.Message);
 
                 throw;
             }

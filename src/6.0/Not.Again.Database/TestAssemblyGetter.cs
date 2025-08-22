@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Not.Again.Domain;
@@ -13,6 +14,17 @@ namespace Not.Again.Database
         public TestAssemblyGetter(NotAgainDbContext context)
         {
             _context = context;
+        }
+
+        public async Task<IEnumerable<TestAssembly>> GetAsync()
+        {
+            var dbTestAssemblies =
+                await
+                    _context
+                        .TestAssembly
+                        .ToListAsync();
+
+            return dbTestAssemblies;
         }
 
         public async Task<TestAssembly> GetAsync(TestAssembly testAssembly)
