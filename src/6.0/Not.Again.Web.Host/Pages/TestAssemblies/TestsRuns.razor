@@ -13,11 +13,12 @@
 @if (TestRuns.Any())
 {
     <ul>
-    @foreach (var testRun in TestRuns)
-    {
-        <li>@testRun.TestName, @testRun.RunDate, @testRun.Status</li>
-    }
+        @foreach (var testRun in TestRuns)
+        {
+            <li>@testRun.TestName, @testRun.RunDate, @testRun.Status</li>
+        }
     </ul>
+    <TestRunChart/>
 }
 else
 {
