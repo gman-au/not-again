@@ -27,20 +27,35 @@ namespace Not.Again.Api.Host.Injection
                 .AddTransient<IArgumentDelimiter, ArgumentDelimiter>()
                 .AddTransient<IMessageFormatter, MessageFormatter>();
 
-            var connectionString =
+            var connectionStringSqlServer =
                 configuration
-                    .GetConnectionString("NOT-AGAIN");
+                    .GetConnectionString("NOT-AGAIN-SQL-SERVER");
 
-            if (string.IsNullOrEmpty(connectionString))
-                throw new Exception(StandardMessages.NoConnectionStringMessage);
-            
-            services
-                .AddDbContext<NotAgainDbContext>(
-                    o =>
-                        o.UseSqlServer(connectionString)
-                );
+            var connectionStringPostgreSql =
+                configuration
+                    .GetConnectionString("NOT-AGAIN-SQL-POSTGRESQL");
 
-            return services;
+            if (!string.IsNullOrEmpty(connectionStringSqlServer))
+            {
+                services
+                    .AddDbContext<NotAgainDbContext>(o =>
+                        o.UseSqlServer(connectionStringSqlServer)
+                    );
+
+                return services;
+            }
+
+            if (!string.IsNullOrEmpty(connectionStringPostgreSql))
+            {
+                services
+                    .AddDbContext<NotAgainDbContext>(o =>
+                        o.UseNpgsql(connectionStringPostgreSql)
+                    );
+
+                return services;
+            }
+
+            throw new Exception(StandardMessages.NoConnectionStringMessage);
         }
     }
 }
