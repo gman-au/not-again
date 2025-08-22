@@ -4,7 +4,7 @@ using Not.Again.Contracts;
 
 namespace Not.Again.Web.Host.Infrastructure
 {
-    public interface ITestRunAggregator
+    public interface ITestAssemblyAggregator
     {
         Task<GetAssembliesResponse> GetAllTestAssembliesAsync(CancellationToken cancellationToken);
     }

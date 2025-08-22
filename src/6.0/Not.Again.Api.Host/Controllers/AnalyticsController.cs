@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -14,13 +15,16 @@ namespace Not.Again.Api.Host.Controllers
     {
         private readonly ILogger<AnalyticsController> _logger;
         private readonly ITestAssemblyGetter _testAssemblyGetter;
+        private readonly ITestRecordGetter _testRecordGetter;
 
         public AnalyticsController(
             ILogger<AnalyticsController> logger,
-            ITestAssemblyGetter testAssemblyGetter)
+            ITestAssemblyGetter testAssemblyGetter,
+            ITestRecordGetter testRecordGetter)
         {
             _logger = logger;
             _testAssemblyGetter = testAssemblyGetter;
+            _testRecordGetter = testRecordGetter;
         }
 
         [HttpGet("GetAssemblies")]
@@ -42,6 +46,38 @@ namespace Not.Again.Api.Host.Controllers
                         {
                             TestAssemblyId = o.TestAssemblyId,
                             TestAssemblyShortName = o.TestAssemblyName.ToShortName()
+                        })
+                        .ToList()
+            };
+
+            return
+                result;
+        }
+
+        [HttpGet("GetTestRecords/{assemblyId:guid?}")]
+        public async Task<GetTestRecordsResponse> GetTestRecords(Guid? assemblyId)
+        {
+            _logger
+                .LogInformation("GetTestRecords received");
+
+            var testRecords =
+                await
+                    _testRecordGetter
+                        .GetAsync(assemblyId);
+
+            var result = new GetTestRecordsResponse
+            {
+                TestRecords =
+                    testRecords
+                        .Select(o => new TestDetails
+                        {
+                            Id = o.TestRecordId.ToString(),
+                            ClassName = o.ClassName,
+                            FullName = o.FullName,
+                            MethodName = o.MethodName,
+                            TestName = o.TestName,
+                            Arguments = o.DelimitedTestArguments.Split(','),
+                            Hash = o.LastHash
                         })
                         .ToList()
             };

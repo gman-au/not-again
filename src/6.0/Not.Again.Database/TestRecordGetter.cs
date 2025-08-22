@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Not.Again.Domain;
@@ -13,6 +15,20 @@ namespace Not.Again.Database
         public TestRecordGetter(NotAgainDbContext context)
         {
             _context = context;
+        }
+
+        public async Task<IEnumerable<TestRecord>> GetAsync(
+            Guid? testAssemblyId = null
+        )
+        {
+            var dbTestRecords =
+                await
+                    _context
+                        .TestRecord
+                        .Where(o => !testAssemblyId.HasValue || testAssemblyId.Value == o.TestAssemblyId)
+                        .ToListAsync();
+
+            return dbTestRecords;
         }
 
         public async Task<TestRecord> GetAsync(

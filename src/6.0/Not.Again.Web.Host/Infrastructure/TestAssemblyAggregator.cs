@@ -4,11 +4,11 @@ using Not.Again.Contracts;
 
 namespace Not.Again.Web.Host.Infrastructure
 {
-    public class TestRunAggregator : ITestRunAggregator
+    public class TestAssemblyAggregator : ITestAssemblyAggregator
     {
         private readonly IApiAdapter _apiAdapter;
 
-        public TestRunAggregator(IApiAdapter apiAdapter)
+        public TestAssemblyAggregator(IApiAdapter apiAdapter)
         {
             _apiAdapter = apiAdapter;
         }

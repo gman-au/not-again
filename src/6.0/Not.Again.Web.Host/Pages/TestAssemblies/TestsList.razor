@@ -1,0 +1,44 @@
+﻿@page "/testRecords"
+@page "/testRecords/{AssemblyId}"
+@using System.Threading
+@using Not.Again.Contracts
+@using Not.Again.Web.Host.Infrastructure
+@inject ITestRecordAggregator Aggregator
+<PageTitle>Test Explorer</PageTitle>
+
+<h3>Test Explorer</h3>
+
+@if (TestDetails.Any())
+{
+    <ul>
+    @foreach (var testDetails in TestDetails)
+    {
+        <li>@testDetails.TestName</li>
+    }
+    </ul>
+}
+else
+{
+    <p>No test assemblies have been found.</p>
+}
+
+@code {
+
+    [Parameter]
+    public string AssemblyId { get; set; }
+
+    private IEnumerable<TestDetails> TestDetails { get; set; } = new List<TestDetails>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Guid.TryParse(AssemblyId, out var assemblyId);
+        Guid? parameter = assemblyId == Guid.Empty ? null : assemblyId;
+
+            var testRecords =
+                await
+                    Aggregator
+                        .GetTestRecordsAsync(parameter, CancellationToken.None);
+
+            TestDetails = testRecords?.TestRecords ?? Enumerable.Empty<TestDetails>();
+        }
+    }

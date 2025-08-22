@@ -13,7 +13,8 @@ namespace Not.Again.Web.Host.Injection
         {
             services
                 .AddTransient<IApiAdapter, ApiAdapter>()
-                .AddTransient<ITestRunAggregator, TestRunAggregator>();
+                .AddTransient<ITestAssemblyAggregator, TestAssemblyAggregator>()
+                .AddTransient<ITestRecordAggregator, TestRecordAggregator>();
 
             services
                 .Configure<WebHostConfigurationOptions>(
