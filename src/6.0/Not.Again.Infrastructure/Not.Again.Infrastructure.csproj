@@ -2,22 +2,6 @@
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-        <DebugType>Embedded</DebugType>
-        <EmbedUntrackedSources>true</EmbedUntrackedSources>
-        <IncludeSymbols>false</IncludeSymbols>
-        <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-    </PropertyGroup>
-
-    <PropertyGroup>
-        <Authors>G-MAN Solutions</Authors>
-    </PropertyGroup>
-
-    <PropertyGroup>
-        <PackageId>Not.Again.Infrastructure</PackageId>
-        <Description>Not Again infrastructure module</Description>
-        <RepositoryUrl>https://github.com/gman-au/not-again</RepositoryUrl>
     </PropertyGroup>
 
     <ItemGroup>
