@@ -1,0 +1,30 @@
+services:
+    postgres:
+        container_name: Not.Again.Postgres
+        image: postgres:13.22-trixie
+        ports:
+            - "5432:5432"      
+        environment:
+            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U postgres"]
+            interval: 5s
+            timeout: 5s
+            retries: 5
+        
+    not-again-api:
+        container_name: Not.Again.Api
+        image: ghcr.io/gman-au/not-again/not-again-api:latest
+        ports:
+            - "5000:5000"
+        depends_on:
+            postgres:
+                condition: service_healthy            
+        environment:
+            ConnectionStrings__NOT-AGAIN-SQL-POSTGRESQL: "Host=Not.Again.Postgres;Port=5432;Username=postgres;Password=${POSTGRES_PASSWORD};Database=not-again"
+            ASPNETCORE_URLS: "http://+:5000"
+            ASPNETCORE_ENVIRONMENT: "Development"
+        
+networks:
+    default:
+        name: ${RUNTIME_NETWORK}
