@@ -2,7 +2,7 @@
 <RunSettings>
     <RunConfiguration>
         <EnvironmentVariables>
-            <NOT_AGAIN_URL>http://localhost:5033</NOT_AGAIN_URL>
+            <NOT_AGAIN_URL>http://localhost:5000</NOT_AGAIN_URL>
             <RERUN_TESTS_OLDER_THAN_DAYS>20</RERUN_TESTS_OLDER_THAN_DAYS>
         </EnvironmentVariables>
     </RunConfiguration>
