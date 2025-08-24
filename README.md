@@ -7,12 +7,10 @@
 
 ![GitHub Release](https://img.shields.io/github/v/release/gman-au/not-again)
 
-![Docker Version](https://img.shields.io/docker/v/gman82/not-again-api)
-
-[Docker image](https://hub.docker.com/repository/docker/gman82/not-again-api)
+![NuGet Version](https://img.shields.io/nuget/v/Not.Again.NUnit?label=Not.Again.NUnit)
 
 ## Summary
-This is a very simple, lightweight API that can be set up to persist test runs in an (SQL Server) database.
+This is a very simple, lightweight API that can be set up to persist test runs in a Postgres or SQL Server database.
 
 Although written with plugins for C#, the API itself is agnostic and can accept check and result submissions from any language / technology.
 
@@ -88,19 +86,28 @@ TestRun}o--||TestRecord : ""
 ```
 <!--- SIREN_END -->
 
-
 # Installation / usage
+
+## Docker compose
+Included in the [`.compose/`](https://github.com/gman-au/not-again/tree/master/.compose/not-again) sub folder is a (minimal) Docker compose file you can use to set up both a Postgres database, and the API configured to use it. 
+
+You can modify the `.env` file to customise values like Postgres database passwords, etc.
+
 ## Running the API
 * This repo contains the entire source code for the API, as well as the domain model and database migrations to set up the required database
-* Alternatively, you can also find the API docker image at [this link](https://hub.docker.com/repository/docker/gman82/not-again-api)
-* When running either of the above, you will need to pass a single environment variable `ConnectionStrings__NOT-AGAIN` (either via [Docker environment variables](https://docs.docker.com/compose/environment-variables/set-environment-variables/), or `dotnet` runtime variables)
+* Alternatively, you can also find the API docker image under the [releases](https://github.com/gman-au/not-again/releases) section.
+* When running either of the above, you will need to pass a single environment variable, either:
+  * `ConnectionStrings__NOT-AGAIN-SQL-SERVER`, or
+  * `ConnectionStrings__NOT-AGAIN-SQL-POSTGRESQL`
+* (either via [Docker environment variables](https://docs.docker.com/compose/environment-variables/set-environment-variables/), or `dotnet` runtime variables)
 * This value will be the [database connection string](https://www.connectionstrings.com/sql-server/) that the API has access to in order to persist the test data
+
 ### Docker command example
 ```powershell
-docker run -d -p 80:80 -e ConnectionStrings__NOT-AGAIN='<MY_DATABASE_CONNECTION_STRING>' gman82/not-again-api:latest
+docker run -d -p 80:80 -e ConnectionStrings__NOT-AGAIN-SQL-POSTGRESQL='<MY_DATABASE_CONNECTION_STRING>' ghcr.io/gman-au/not-again/not-again-api:latest
 ```
-<sub>NOTE: you may need to use **single quotes** in the connection string to escape the equals signs.</sub>
-
+> [!NOTE]
+> You may need to use **single quotes** in the connection string to escape the equals signs.
 
 # Configuring your tests to use Not-Again
 ## .NET via NuGet package
@@ -121,7 +128,7 @@ When running the tests (i.e. `dotnet test`), the following environment variables
 * `NOT_AGAIN_URL` - this is the base URL of your `Not-Again` API host e.g. `https://localhost`
 * `RERUN_TESTS_OLDER_THAN_DAYS` _(optional)_ - this value specifies the threshold, in days, at which a passing test is deemed 'stale' and should be re-run. Tests with run dates falling _inside_ this threshold will not be re-run.
 
-> [!IMPORTANT]  
+> [!WARNING]  
 > If `RERUN_TESTS_OLDER_THAN_DAYS` is omitted, it will trigger **all** of your tests to re-run, regardless.
 
 So, for example, the following command would pass the above variables through to the testing environment:
@@ -156,4 +163,4 @@ With these metrics, there is no reason why future features could not leverage th
 * [Currents.dev](https://currents.dev)
 * [Microsoft Playwright Testing](https://azure.microsoft.com/en-au/products/playwright-testing)
 
-In fact, the primary driver for this platform was the absence of a .NET equivalent for the above (I really thought Microsoft Playwright Testing would support .NET!)
+<sub><i>In fact, the primary driver for this platform was the absence of a .NET equivalent for the above (I really thought Microsoft Playwright Testing would support .NET!)</i></sub>
