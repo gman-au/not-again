@@ -3,15 +3,24 @@
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+        <GenerateRuntimeConfigurationFiles>false</GenerateRuntimeConfigurationFiles>
         <DebugType>Embedded</DebugType>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <IncludeSymbols>false</IncludeSymbols>
+        <IncludeSource>false</IncludeSource>
         <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <OutputType>Library</OutputType>
     </PropertyGroup>
 
     <PropertyGroup>
-        <Authors>G-MAN Solutions</Authors>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <IncludeReferencedProjects>true</IncludeReferencedProjects>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Company>G-MAN Solutions</Company>
+        <Authors>Gabriel Palma</Authors>
     </PropertyGroup>
 
     <PropertyGroup>
@@ -21,7 +30,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <InternalsVisibleTo Include="Not.Again.Tests.Unit" />
+        <InternalsVisibleTo Include="Not.Again.Tests.Unit" PrivateAssets="All"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -31,6 +40,14 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Not.Again.Infrastructure\Not.Again.Infrastructure.csproj"/>
+    </ItemGroup>
+
+    <!-- Include referenced project outputs -->
+    <ItemGroup>
+        <None Include="$(OutputPath)Not.Again.*.*.dll" Pack="true" PackagePath="lib\$(TargetFramework)"/>
+        <None Include="$(OutputPath)Not.Again.*.dll" Pack="true" PackagePath="lib\$(TargetFramework)"/>
+        <None Include="$(OutputPath)Not.Again.*.*.pdb" Pack="true" PackagePath="lib\$(TargetFramework)"/>
+        <None Include="$(OutputPath)Not.Again.*.pdb" Pack="true" PackagePath="lib\$(TargetFramework)"/>
     </ItemGroup>
 
 </Project>
