@@ -1,10 +1,8 @@
 name: nuget
 
 on:
-  release:
-    types: [ published ] 
-    tags:
-      - v*
+  workflow_dispatch:
+  
 jobs:
   nuget:
     runs-on: ubuntu-latest
