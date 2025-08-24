@@ -28,7 +28,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           
       - name: Build image
-        run: docker build --file ./src/6.0/Not.Again.Api.Host/Dockerfile --tag built-image ./src
+        run: docker build --file ./src/6.0/Not.Again.Api.Host/Dockerfile --tag built-image ./src/6.0
 
       - name: Push image
         run: |
