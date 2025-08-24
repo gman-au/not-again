@@ -24,10 +24,4 @@
       <ProjectReference Include="..\Not.Again.Interfaces\Not.Again.Interfaces.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <None Include="appsettings.Development.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
-
 </Project>
