@@ -21,7 +21,7 @@ namespace Not.Again.Tests.Unit
         public void ArrangeConnectionString()
         {
             Environment.SetEnvironmentVariable(
-                StandardConstants.ConnectionStringVariableName,
+                StandardConstants.ConnectionStringVariableNameSqlServer,
                 "server=127.0.0.1;"
             );
 

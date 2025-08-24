@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Not.Again.Api.Host.Injection;
+using Not.Again.Database;
 
 var builder =
     WebApplication
@@ -34,6 +35,21 @@ services
 var app =
     builder
         .Build();
+
+// Verify DB
+using var scope =
+    app
+        .Services
+        .CreateScope();
+
+var databaseInitialiser =
+    scope
+        .ServiceProvider
+        .GetRequiredService<NotAgainDbContext>();
+
+databaseInitialiser
+    .Database
+    .EnsureCreated();
 
 if (app.Environment.IsDevelopment())
 {
